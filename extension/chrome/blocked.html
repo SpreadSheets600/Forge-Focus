@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>FocusForge - Site Blocked</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: white;
+    }
+
+    .container {
+      text-align: center;
+      padding: 40px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      max-width: 600px;
+    }
+
+    .icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    h1 {
+      font-size: 48px;
+      margin: 0 0 20px 0;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .site-name {
+      font-size: 24px;
+      margin: 20px 0;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      word-break: break-all;
+    }
+
+    .message {
+      font-size: 20px;
+      margin: 30px 0;
+      line-height: 1.6;
+    }
+
+    .quote {
+      font-style: italic;
+      font-size: 18px;
+      margin: 30px 0;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-left: 4px solid white;
+      border-radius: 5px;
+    }
+
+    .stats {
+      margin-top: 30px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .stat {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 15px;
+      border-radius: 10px;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: bold;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon">🎯</div>
+    <h1>Focus Time!</h1>
+    
+    <div class="site-name" id="siteName">This website is blocked</div>
+    
+    <div class="message">
+      This website is blocked during your focus session.<br>
+      Stay strong and keep working towards your goals! 💪
+    </div>
+
+    <div class="quote" id="quote">
+      "The key to success is to focus our conscious mind on things we desire, not things we fear."
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-value" id="sessionTime">--</div>
+        <div class="stat-label">Session Time</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="blockedAttempts">--</div>
+        <div class="stat-label">Blocked Today</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Get blocked site from URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const blockedSite = urlParams.get('site');
+    
+    if (blockedSite) {
+      document.getElementById('siteName').textContent = blockedSite;
+    }
+
+    // Motivational quotes
+    const quotes = [
+      "The key to success is to focus our conscious mind on things we desire, not things we fear.",
+      "Focus is the gateway to thinking.",
+      "Productivity is never an accident. It is always the result of commitment.",
+      "You are in control of your time and your focus.",
+      "Deep work produces deep results.",
+      "Discipline equals freedom.",
+      "Stay committed to your decisions, but flexible in your approach."
+    ];
+
+    document.getElementById('quote').textContent = quotes[Math.floor(Math.random() * quotes.length)];
+
+    // Fetch focus session status
+    fetch('http://localhost:8765/focus/status')
+      .then(r => r.json())
+      .then(data => {
+        if (data.session_duration) {
+          const minutes = Math.floor(data.session_duration / 60);
+          document.getElementById('sessionTime').textContent = `${minutes}m`;
+        }
+      })
+      .catch(err => console.error('Error fetching status:', err));
+
+    // Load blocked attempts from storage
+    chrome.storage.local.get(['blockedAttempts'], (result) => {
+      const count = (result.blockedAttempts || 0) + 1;
+      chrome.storage.local.set({ blockedAttempts: count });
+      document.getElementById('blockedAttempts').textContent = count;
+    });
+  </script>
+</body>
+</html>
