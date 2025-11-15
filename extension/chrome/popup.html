@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>FocusForge</title>
+  <style>
+    body {
+      width: 300px;
+      padding: 15px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      margin: 0;
+    }
+
+    h2 {
+      margin: 0 0 15px 0;
+      font-size: 20px;
+    }
+
+    .status {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .status-active {
+      background: rgba(67, 233, 123, 0.3);
+      border: 2px solid #43e97b;
+    }
+
+    .stats {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .stat-item {
+      display: flex;
+      justify-content: space-between;
+      margin: 8px 0;
+      font-size: 14px;
+    }
+
+    .stat-value {
+      font-weight: bold;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 6px;
+      background: white;
+      color: #667eea;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: #f0f0f0;
+    }
+
+    .link {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 12px;
+    }
+
+    .link a {
+      color: white;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h2>⚡ FocusForge</h2>
+  
+  <div id="statusContainer" class="status">
+    <div id="statusText">Checking status...</div>
+  </div>
+
+  <div class="stats">
+    <div class="stat-item">
+      <span>Today's Sites:</span>
+      <span class="stat-value" id="siteCount">--</span>
+    </div>
+    <div class="stat-item">
+      <span>Time Tracked:</span>
+      <span class="stat-value" id="timeTracked">--</span>
+    </div>
+    <div class="stat-item">
+      <span>Blocked Attempts:</span>
+      <span class="stat-value" id="blockedCount">--</span>
+    </div>
+  </div>
+
+  <button id="openApp">Open FocusForge App</button>
+
+  <div class="link">
+    <a href="http://localhost:8765/stats/daily" target="_blank">View Dashboard</a>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
