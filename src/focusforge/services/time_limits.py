@@ -67,9 +67,9 @@ class TimeLimitService:
                 used = self._get_app_usage_seconds(item.pattern)
                 if used >= float(item.daily_limit_seconds or 0):
                     self.over_limit_apps.add(item.pattern.lower())
-                    # Enforce by killing the process (repeatedly if reopened)
+                    # Trigger warning for any running matching processes
                     try:
-                        self.blocker.kill_process(item.pattern)
+                        self.blocker.trigger_warning_for_pattern(item.pattern)
                     except Exception:
                         pass
             elif item.item_type == 'website':
