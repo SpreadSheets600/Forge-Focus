@@ -47,13 +47,15 @@ class SchedulerService:
         """
         start_hour, start_minute = map(int, start_time.split(':'))
         end_hour, end_minute = map(int, end_time.split(':'))
-        day_list = days.split(',') if days else None
+        # APScheduler CronTrigger expects a cron expression string for day_of_week.
+        # Store and pass as CSV string like "0,1,2" (Mon=0 .. Sun=6).
+        day_expr = days if days else None
         
         # Schedule start
         self.scheduler.add_job(
             func=self._start_focus,
             trigger=CronTrigger(
-                day_of_week=day_list,
+                day_of_week=day_expr,
                 hour=start_hour,
                 minute=start_minute
             ),
@@ -66,7 +68,7 @@ class SchedulerService:
         self.scheduler.add_job(
             func=self._stop_focus,
             trigger=CronTrigger(
-                day_of_week=day_list,
+                day_of_week=day_expr,
                 hour=end_hour,
                 minute=end_minute
             ),
