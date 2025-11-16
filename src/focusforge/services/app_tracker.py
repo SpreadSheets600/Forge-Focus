@@ -170,6 +170,7 @@ def track_app_usage(session, tracker: AppTracker, interval: int = 1):
                             end_time=end_time,
                             total_seconds=duration,
                         )
+                        active_record = None  # last DB record being extended
                         session.add(record)
                         session.commit()
 
