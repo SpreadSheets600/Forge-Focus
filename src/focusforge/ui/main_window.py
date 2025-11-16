@@ -95,6 +95,51 @@ class FocusForgeUI:
             ),
         )
         
+        # Connect blocker UI warning callback (ensure UI exists)
+        def _warn(app_name: str, pid: int):
+            # Schedule UI dialog on main thread
+            def show_dialog():
+                title = ft.Text(f"{app_name}", color=ft.Colors.RED, size=18, weight=ft.FontWeight.BOLD)
+                txt = ft.Text("This app is blocked during focus. Close it to continue.")
+                def close_app(_):
+                    try:
+                        self.blocker.force_kill_pid(pid)
+                    finally:
+                        dlg.open = False
+                        self.page.update()
+                dlg.actions = [
+                    ft.ElevatedButton("Close App", bgcolor=ft.Colors.RED, color=ft.Colors.WHITE, on_click=close_app),
+                ]
+                dlg.title = title
+                dlg.content = txt
+                dlg.modal = True
+                dlg.open = True
+                self.page.update()
+
+            # Prepare dialog control once and reuse
+            if not hasattr(self, "_block_dialog"):
+                dlg = ft.AlertDialog(modal=True)
+                self._block_dialog = dlg
+                self.page.dialog = dlg
+            else:
+                dlg = self._block_dialog
+
+            # Try to marshal to UI thread if available
+            try:
+                if hasattr(self.page, "run_on_main"):
+                    self.page.run_on_main(show_dialog)
+                else:
+                    show_dialog()
+            except Exception:
+                # Best-effort fallback
+                show_dialog()
+
+        # register callback
+        try:
+            self.blocker.set_warning_callback(_warn)
+        except Exception:
+            pass
+
         # Sidebar navigation
         sidebar = ft.Container(
             content=ft.Column([
@@ -505,11 +550,21 @@ class FocusForgeUI:
                     self.page.snack_bar.open = True
                     self.page.update()
 
+            def test_now(_):
+                try:
+                    # Manually trigger a warning for matching running processes
+                    self.blocker.trigger_warning_for_pattern(item.pattern)
+                except Exception as ex:
+                    self.page.snack_bar = ft.SnackBar(ft.Text(f"Test failed: {ex}"), bgcolor=ft.Colors.RED)
+                    self.page.snack_bar.open = True
+                    self.page.update()
+
             return ft.Row([
                 ft.Text(item.name, size=14, expand=True),
                 ft.Text(item.pattern, size=12, color=ft.Colors.WHITE70, width=220),
                 minutes_field,
                 ft.ElevatedButton("Save", on_click=save_limit, bgcolor="#667eea"),
+                ft.OutlinedButton("Test", on_click=test_now),
             ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
 
         return ft.Column([
@@ -694,7 +749,7 @@ class FocusForgeUI:
                     ft.Text(f"{schedule.start_time} - {schedule.end_time} | Days: {schedule.days_of_week}",
                            size=14, color=ft.Colors.WHITE70),
                 ], expand=True),
-                ft.IconButton(icon=ft.icons.DELETE, icon_color=ft.Colors.RED, on_click=remove),
+                ft.IconButton(icon=ft.Icons.DELETE, icon_color=ft.Colors.RED, on_click=remove),
             ]),
             bgcolor="#1a1a1a",
             border_radius=10,
